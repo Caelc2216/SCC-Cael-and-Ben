@@ -60,4 +60,5 @@ def reverse_graph(g):
 def dfs_finish_order(g):
     pass
 
-
+def kosarajus(g):
+    pass
