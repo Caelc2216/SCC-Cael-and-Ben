@@ -54,11 +54,32 @@ class Graph:
     def get_edges(self):
         return self.edge_list
 
-def reverse_graph(g):
-    pass
+def reverse_graph(g: Graph):
+    newGraph = Graph()
+    for node in g.get_nodes():
+        newGraph.add_node(node, g.get_node_data(node))
+        for child in g.get_children(node):
+            newGraph.add_node(child, g.get_node_data(child))
+            newGraph.add_edge(child, node, g.get_edge_data(node, child))
+    return newGraph
 
-def dfs_finish_order(g):
-    pass
 
-def kosarajus(g):
-    pass
+def dfs_finish_order(g: Graph):
+    visited = set()
+    finish_order = []
+    for node in g.get_nodes():
+        if node not in visited:
+            def dfs_recursive(node):
+                visited.add(node)
+                for child in g.get_children(node):
+                    if child not in visited:
+                        dfs_recursive(child)
+                finish_order.append(node)
+            dfs_recursive(node)
+    return finish_order
+            
+
+
+def kosarajus(g: Graph):
+    g_prime = dfs_finish_order(g).reverse()
+    g_reversed = reverse_graph(g)
