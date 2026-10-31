@@ -54,6 +54,8 @@ class Graph:
     def get_edges(self):
         return self.edge_list
 
+
+# Part 1: Reverse the graph
 def reverse_graph(g: Graph):
     newGraph = Graph()
     for node in g.get_nodes():
@@ -63,7 +65,7 @@ def reverse_graph(g: Graph):
             newGraph.add_edge(child, node, g.get_edge_data(node, child))
     return newGraph
 
-
+# Part 2: DFS Finish Order
 def dfs_finish_order(g: Graph):
     visited = set()
     finish_order = []
@@ -77,9 +79,47 @@ def dfs_finish_order(g: Graph):
                 finish_order.append(node)
             dfs_recursive(node)
     return finish_order
-            
 
-
+# Part 3: Kosaraju's Algorithm
 def kosarajus(g: Graph):
-    g_prime = dfs_finish_order(g).reverse()
-    g_reversed = reverse_graph(g)
+    postorder_reversed = dfs_finish_order(g)[::-1] # reversed
+    reversed_edge_directions = reverse_graph(g)
+    
+    visited = set()
+    groups = []
+    for node in postorder_reversed:
+        
+        if node not in visited:
+            current_group = []
+            def dfs_recursive(node):
+                visited.add(node)
+                for child in reversed_edge_directions.get_children(node):
+                    if child not in visited:
+                        dfs_recursive(child)
+                current_group.append(node)
+            dfs_recursive(node)
+            groups.append(current_group)
+
+    g_prime = Graph()
+
+    node_to_group = {}
+    for group in groups:
+        current_added_frozen_group = frozenset(group)
+        g_prime.add_node(current_added_frozen_group)
+        for node in group:
+            node_to_group[node] = current_added_frozen_group
+
+    for parent, child in g.get_edges():
+        parent_group = node_to_group[parent]
+        child_group = node_to_group[child]
+
+        if parent_group != child_group and not g_prime.contains_edge(parent_group, child_group):
+            g_prime.add_edge(parent_group, child_group)
+
+    return g_prime
+
+
+
+
+
+
